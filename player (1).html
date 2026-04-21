@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="PT Player" />
+<meta name="theme-color" content="#0f0f0d" />
+<title>PT Player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f0f0d;
+  --bg2: #1a1a17;
+  --bg3: #232320;
+  --bg4: #2c2c28;
+  --line: rgba(255,255,255,0.07);
+  --line2: rgba(255,255,255,0.13);
+  --text: #f0ede4;
+  --text2: #8a8780;
+  --text3: #55534e;
+  --gold: #c9a84c;
+  --gold2: #e8c97a;
+  --red: #c0392b;
+  --red-bg: rgba(192,57,43,0.12);
+  --green-bg: rgba(74,124,89,0.15);
+  --green-text: #7dbd94;
+  --radius: 10px;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+
+/* ── LAYOUT ── */
+.top-panel {
+  flex-shrink: 0;
+  background: var(--bg);
+  border-bottom: 0.5px solid var(--line);
+  padding: calc(0.6rem + env(safe-area-inset-top)) 1rem 0.6rem;
+}
+
+.top-inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem 1rem 5rem;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.header-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.header-title em { font-style: italic; color: var(--gold2); }
+
+.header-right { display: flex; gap: 8px; }
+
+.icon-btn {
+  background: var(--bg3);
+  border: 0.5px solid var(--line2);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.icon-btn:hover { background: var(--bg4); color: var(--text); }
+.icon-btn.active-btn { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+/* ── SETTINGS PANEL ── */
+.settings-panel {
+  display: none;
+  background: var(--bg2);
+  border: 0.5px solid var(--line2);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 0.6rem;
+  animation: fadeIn 0.2s ease;
+}
+.settings-panel.open { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.settings-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.settings-row { margin-bottom: 8px; }
+.settings-row label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.settings-note { font-size: 11px; color: var(--text3); margin-top: 6px; line-height: 1.5; }
+.settings-note a { color: var(--gold); text-decoration: none; }
+
+.api-status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-top: 5px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  display: none;
+}
+.api-status.ok { background: var(--green-bg); color: var(--green-text); display: block; }
+.api-status.err { background: var(--red-bg); color: #e07060; display: block; }
+
+/* ── ADD DRAWER ── */
+.add-drawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.add-drawer.open { max-height: 320px; }
+.add-drawer-inner {
+  padding: 0.5rem 0 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.add-row { display: flex; gap: 6px; }
+
+/* ── NOW PLAYING CARD ── */
+.now-playing {
+  background: var(--bg2);
+  border: 0.5px solid var(--line2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 0.6rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 90px;
+}
+
+.now-playing::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+
+.np-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.np-pt {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin-bottom: 6px;
+  min-height: 28px;
+}
+
+.np-en {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.4;
+  min-height: 18px;
+  transition: opacity 0.3s;
+}
+
+.np-phonetic {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.np-col {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text3);
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── PROGRESS BAR ── */
+.playback-bar {
+  margin-bottom: 0.6rem;
+}
+
+.playback-track {
+  background: var(--bg4);
+  border-radius: 99px;
+  height: 3px;
+  cursor: pointer;
+  position: relative;
+}
+
+.playback-fill {
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  border-radius: 99px;
+  height: 3px;
+  transition: width 0.5s linear;
+  pointer-events: none;
+}
+
+.playback-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.playback-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text3);
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+
+.ctrl-btn {
+  background: var(--bg3);
+  border: 0.5px solid var(--line);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 12px;
+  transition: all 0.15s;
+}
+.ctrl-btn:hover { background: var(--bg4); color: var(--text); }
+.ctrl-btn.active-ctrl { color: var(--gold); border-color: var(--gold); }
+
+.play-pause-btn {
+  background: var(--gold);
+  border: none;
+  color: var(--bg);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.play-pause-btn:hover { background: var(--gold2); transform: scale(1.05); }
+.play-pause-btn.loading { opacity: 0.6; cursor: wait; }
+
+/* ── OPTIONS ROW ── */
+.options-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.opt-tag {
+  padding: 5px 11px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 0.5px solid var(--line2);
+  cursor: pointer;
+  background: var(--bg2);
+  color: var(--text2);
+  transition: all 0.15s;
+  user-select: none;
+  font-family: var(--font-mono);
+}
+.opt-tag:hover { background: var(--bg3); }
+.opt-tag.active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+/* ── SPEED ROW ── */
+.speed-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.speed-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text3);
+  min-width: 22px;
+}
+
+.speed-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--gold);
+  min-width: 28px;
+  text-align: right;
+}
+
+input[type=range] { flex: 1; accent-color: var(--gold); height: 3px; }
+
+/* ── SENTENCE LIST ── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  margin-bottom: 8px;
+  margin-top: 1rem;
+}
+
+.sentence-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.s-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 11px 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.s-card:hover { border-color: var(--line2); }
+.s-card.playing { border-color: var(--gold); background: var(--bg3); }
+
+.s-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text3);
+  min-width: 22px;
+}
+
+.s-text { flex: 1; min-width: 0; }
+
+.s-pt {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.s-en {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.s-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 12px;
+  padding: 3px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+.s-del:hover { color: var(--red); }
+
+/* ── INPUTS ── */
+.input-field {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 0.5px solid var(--line2);
+  font-size: 12px;
+  background: var(--bg3);
+  color: var(--text);
+  font-family: var(--font-body);
+  transition: border-color 0.15s;
+}
+.input-field:focus { outline: none; border-color: var(--gold); background: var(--bg4); }
+.input-field::placeholder { color: var(--text3); }
+
+.add-btn {
+  padding: 8px 14px;
+  border-radius: 7px;
+  border: none;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.add-btn:hover { background: var(--gold2); }
+
+.save-btn {
+  padding: 7px 14px;
+  border-radius: 7px;
+  border: none;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  margin-top: 6px;
+  transition: background 0.15s;
+}
+.save-btn:hover { background: var(--gold2); }
+
+/* ── CACHE STATUS ── */
+.cache-bar {
+  background: var(--bg2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 13px;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cache-info {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+}
+
+.cache-sub {
+  font-size: 9px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.preload-btn {
+  padding: 5px 11px;
+  border-radius: 99px;
+  border: 0.5px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.preload-btn:hover { background: var(--gold); color: var(--bg); }
+.preload-btn:disabled { opacity: 0.4; cursor: wait; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg3);
+  border: 0.5px solid var(--line2);
+  border-radius: 99px;
+  padding: 7px 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text2);
+  opacity: 0;
+  transition: all 0.25s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text3);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+</style>
+</head>
+<body>
+
+<div class="top-panel">
+  <div class="top-inner">
+
+    <div class="header">
+      <div>
+        <div class="header-eyebrow">European Portuguese</div>
+        <div class="header-title">PT <em>Player</em></div>
+      </div>
+      <div class="header-right">
+        <button class="icon-btn" id="add-btn" onclick="toggleAdd()" title="Add sentence">＋</button>
+        <button class="icon-btn" id="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="settings-panel" id="settings-panel">
+      <div class="settings-title">Settings</div>
+      <div class="settings-row">
+        <label>ElevenLabs API Key</label>
+        <input class="input-field" type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" />
+        <div class="api-status" id="api-status"></div>
+        <p class="settings-note">Required for native EP audio. Get a free key at <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank">elevenlabs.io</a> — Text to Speech → Read only.</p>
+      </div>
+      <div class="settings-row">
+        <label>EP Voice</label>
+        <select class="input-field" id="voice-select">
+          <option value="XB0fDUnXU5powFXDhCwa">Charlotte (EP Female)</option>
+          <option value="pqHfZKP75CvOlQylNhV4">Bill (EP Male)</option>
+          <option value="onwK4e9ZLuTAKqWW03F9">Daniel (EP Male)</option>
+        </select>
+      </div>
+      <button class="save-btn" onclick="saveSettings()">Save settings</button>
+    </div>
+
+    <!-- ADD DRAWER -->
+    <div class="add-drawer" id="add-drawer">
+      <div class="add-drawer-inner">
+        <input class="input-field" id="input-pt" placeholder="Portuguese sentence" />
+        <input class="input-field" id="input-en" placeholder="English translation" />
+        <input class="input-field" id="input-phonetic" placeholder="Phonetic hint (optional)" />
+        <div class="add-row">
+          <input class="input-field" id="input-coll" placeholder="Collection" style="flex:1" />
+          <button class="add-btn" onclick="addSentence()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOW PLAYING -->
+    <div class="now-playing">
+      <div class="np-label">Now playing</div>
+      <div class="np-pt" id="np-pt">—</div>
+      <div class="np-en" id="np-en"></div>
+      <div class="np-phonetic" id="np-phonetic"></div>
+      <div class="np-col" id="np-col"></div>
+    </div>
+
+    <!-- PLAYBACK PROGRESS -->
+    <div class="playback-bar">
+      <div class="playback-track" onclick="seekTo(event)">
+        <div class="playback-fill" id="playback-fill" style="width:0%"></div>
+      </div>
+      <div class="playback-info">
+        <span class="playback-count" id="playback-count">0 / 0</span>
+        <span class="playback-count" id="playback-mode-label">PT → EN</span>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <div class="ctrl-group">
+        <button class="ctrl-btn" id="shuffle-btn" onclick="toggleShuffle()" title="Shuffle">⇌</button>
+        <button class="ctrl-btn" id="loop-btn" onclick="toggleLoop()" title="Loop">↺</button>
+      </div>
+      <div class="ctrl-group">
+        <button class="ctrl-btn" onclick="prevTrack()">◀◀</button>
+        <button class="play-pause-btn" id="play-pause-btn" onclick="togglePlayPause()">▶</button>
+        <button class="ctrl-btn" onclick="nextTrack()">▶▶</button>
+      </div>
+      <div class="ctrl-group">
+        <button class="ctrl-btn active-ctrl" id="show-en-btn" onclick="toggleShowEn()" title="Show translation">EN</button>
+        <button class="ctrl-btn active-ctrl" id="show-phon-btn" onclick="toggleShowPhon()" title="Show phonetics">IPA</button>
+      </div>
+    </div>
+
+    <!-- OPTIONS -->
+    <div class="options-row" id="coll-bar"></div>
+
+    <!-- SPEED -->
+    <div class="speed-row">
+      <span class="speed-lbl">slow</span>
+      <input type="range" id="speed-slider" min="40" max="120" value="85" step="1" oninput="updateSpeed(this.value)" />
+      <span class="speed-lbl">fast</span>
+      <span class="speed-val" id="speed-label">0.9×</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- SCROLLABLE LIST -->
+<div class="scroll-content">
+  <div class="app">
+
+    <!-- CACHE STATUS -->
+    <div class="cache-bar">
+      <div>
+        <div class="cache-info" id="cache-info">Audio not preloaded</div>
+        <div class="cache-sub">Preload for offline playback & background audio</div>
+      </div>
+      <button class="preload-btn" id="preload-btn" onclick="preloadAll()">Preload all</button>
+    </div>
+
+    <div class="section-label">Sentences (<span id="total-count">0</span>)</div>
+    <div class="sentence-list" id="sentence-list"></div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── SHARED DEFAULT SENTENCES (same as trainer) ───────────────────────────────
+const DEFAULT_SENTENCES = [
+  { pt: "Eu estou a trabalhar agora.", en: "I am working right now.", phonetic: "Ew shtoh ah tra-ba-LYAR ah-GO-rah.", col: "daily life" },
+  { pt: "Eu acordo cedo de manhã.", en: "I wake up early in the morning.", phonetic: "Ew ah-KOR-doh SAY-doh deh man-YAH.", col: "daily life" },
+  { pt: "Eu preciso de descansar.", en: "I need to rest.", phonetic: "Ew preh-SEE-zoo deh desh-kan-SAR.", col: "daily life" },
+  { pt: "Eu não tenho tempo para fazer isto hoje.", en: "I don't have time to do this today.", phonetic: "Ew NOWNG TEN-yo TEM-poo PAH-rah fah-ZER EESH-too OH-zheh.", col: "daily life" },
+  { pt: "Eu fico em casa à noite.", en: "I stay home at night.", phonetic: "Ew FEE-koo em KAH-zah ah NOY-teh.", col: "daily life" },
+  { pt: "Eu não posso descansar agora.", en: "I can't rest now.", phonetic: "Ew NOWNG POH-soo desh-kan-SAR ah-GO-rah.", col: "daily life" },
+  { pt: "Eu quero comer depois do trabalho.", en: "I want to eat after work.", phonetic: "Ew KEH-roo koo-MAIR deh-POISH doo tra-BA-lyoo.", col: "daily life" },
+  { pt: "Às vezes eu não posso descansar.", en: "Sometimes I can't rest.", phonetic: "Ash VAY-zesh ew NOWNG POH-soo desh-kan-SAR.", col: "daily life" },
+  { pt: "Eu preciso de fazer isto agora.", en: "I need to do this now.", phonetic: "Ew preh-SEE-zoo deh fah-ZER EESH-too ah-GO-rah.", col: "daily life" },
+  { pt: "Eu não posso acordar cedo amanhã.", en: "I can't wake up early tomorrow.", phonetic: "Ew NOWNG POH-soo ah-kor-DAR SAY-doo ah-man-YAH.", col: "daily life" },
+  { pt: "Eu estou a comer agora.", en: "I am eating now.", phonetic: "Ew shtoh ah koo-MAIR ah-GO-rah.", col: "daily life" },
+  { pt: "Eu estou a beber água.", en: "I am drinking water.", phonetic: "Ew shtoh ah beh-BAIR AH-gwah.", col: "daily life" },
+  { pt: "Eu estou a andar a pé.", en: "I am walking.", phonetic: "Ew shtoh ah an-DAR ah PAY.", col: "daily life" },
+  { pt: "Eu estou muito cansado.", en: "I am very tired.", phonetic: "Ew shtoh MWEE-too kan-SAH-doo.", col: "daily life" },
+  { pt: "Eu estou um pouco doente.", en: "I am a little sick.", phonetic: "Ew shtoh oom POH-koo doo-EN-teh.", col: "daily life" },
+  { pt: "Eu estou pronto para sair.", en: "I am ready to leave.", phonetic: "Ew shtoh PRON-too PAH-rah sah-EER.", col: "daily life" },
+  { pt: "Eu tenho fome agora.", en: "I am hungry now.", phonetic: "Ew TEN-yo FOH-meh ah-GO-rah.", col: "daily life" },
+  { pt: "Eu tenho sede.", en: "I am thirsty.", phonetic: "Ew TEN-yo SEH-deh.", col: "daily life" },
+  { pt: "Eu faço isto todos os dias.", en: "I do this every day.", phonetic: "Ew FAH-soo EESH-too TOH-dooz ooz DEE-ash.", col: "daily life" },
+  { pt: "Eu às vezes fico em casa.", en: "I sometimes stay home.", phonetic: "Ew ash VAY-zesh FEE-koo em KAH-zah.", col: "daily life" },
+  { pt: "Eu nunca chego tarde.", en: "I never arrive late.", phonetic: "Ew NOON-kah SHEH-goo TAR-deh.", col: "daily life" },
+  { pt: "Eu já comi.", en: "I already ate.", phonetic: "Ew ZHAH koo-MEE.", col: "daily life" },
+  { pt: "Eu normalmente durmo cedo.", en: "I normally sleep early.", phonetic: "Ew nor-mal-MEN-teh DOOR-moo SAY-doo.", col: "daily life" },
+  { pt: "Eu raramente saio à noite.", en: "I rarely go out at night.", phonetic: "Ew rah-rah-MEN-teh SYE-oo ah NOY-teh.", col: "daily life" },
+  { pt: "Eu quero aprender mais.", en: "I want to learn more.", phonetic: "Ew KEH-roo ah-pren-DAIR MYSH.", col: "wanting & needing" },
+  { pt: "Eu quero falar contigo.", en: "I want to talk to you.", phonetic: "Ew KEH-roo fah-LAR kon-TEE-goo.", col: "wanting & needing" },
+  { pt: "Eu quero ir ao mercado.", en: "I want to go to the market.", phonetic: "Ew KEH-roo EER ow mer-KAH-doo.", col: "wanting & needing" },
+  { pt: "Eu preciso de ajuda.", en: "I need help.", phonetic: "Ew preh-SEE-zoo deh ah-ZHOO-dah.", col: "wanting & needing" },
+  { pt: "Eu preciso de dormir mais.", en: "I need to sleep more.", phonetic: "Ew preh-SEE-zoo deh dor-MEER MYSH.", col: "wanting & needing" },
+  { pt: "Eu preciso de comprar comida.", en: "I need to buy food.", phonetic: "Ew preh-SEE-zoo deh kom-PRAR koo-MEE-dah.", col: "wanting & needing" },
+  { pt: "Eu preciso de falar com ele.", en: "I need to speak with him.", phonetic: "Ew preh-SEE-zoo deh fah-LAR kom EH-leh.", col: "wanting & needing" },
+  { pt: "Eu não quero sair hoje.", en: "I don't want to go out today.", phonetic: "Ew NOWNG KEH-roo sah-EER OH-zheh.", col: "wanting & needing" },
+  { pt: "Eu não preciso de mais nada.", en: "I don't need anything else.", phonetic: "Ew NOWNG preh-SEE-zoo deh MYSH NAH-dah.", col: "wanting & needing" },
+  { pt: "Eu só preciso de um momento.", en: "I just need a moment.", phonetic: "Ew SOH preh-SEE-zoo deh oom moo-MEN-too.", col: "wanting & needing" },
+  { pt: "Eu posso fazer isso amanhã.", en: "I can do that tomorrow.", phonetic: "Ew POH-soo fah-ZER EE-soo ah-man-YAH.", col: "ability" },
+  { pt: "Eu não consigo dormir bem.", en: "I can't sleep well.", phonetic: "Ew NOWNG kon-SEE-goo dor-MEER BEM.", col: "ability" },
+  { pt: "Eu consigo perceber um pouco.", en: "I can understand a little.", phonetic: "Ew kon-SEE-goo per-seh-BAIR oom POH-koo.", col: "ability" },
+  { pt: "Eu não posso ir hoje.", en: "I can't go today.", phonetic: "Ew NOWNG POH-soo EER OH-zheh.", col: "ability" },
+  { pt: "Será que posso perguntar?", en: "May I ask?", phonetic: "Seh-RAH keh POH-soo per-goon-TAR?", col: "ability" },
+  { pt: "Eu acho que é difícil.", en: "I think it's difficult.", phonetic: "Ew AH-shoo keh EH dee-FEE-seel.", col: "opinions" },
+  { pt: "Eu acho que tens razão.", en: "I think you're right.", phonetic: "Ew AH-shoo keh TENZ rah-ZOWNG.", col: "opinions" },
+  { pt: "Eu acho isto muito interessante.", en: "I find this very interesting.", phonetic: "Ew AH-shoo EESH-too MWEE-too een-teh-reh-SAN-teh.", col: "opinions" },
+  { pt: "Eu sinto-me bem hoje.", en: "I feel well today.", phonetic: "Ew SEEN-too-meh BEM OH-zheh.", col: "opinions" },
+  { pt: "Eu sinto-me nervoso antes de falar.", en: "I feel nervous before speaking.", phonetic: "Ew SEEN-too-meh ner-VOH-zoo AN-tesh deh fah-LAR.", col: "opinions" },
+  { pt: "Eu gosto muito de Portugal.", en: "I really like Portugal.", phonetic: "Ew GOSH-too MWEE-too deh por-too-GAL.", col: "opinions" },
+  { pt: "Eu não gosto de acordar cedo.", en: "I don't like waking up early.", phonetic: "Ew NOWNG GOSH-too deh ah-kor-DAR SAY-doo.", col: "opinions" },
+  { pt: "Eu adoro ouvir música portuguesa.", en: "I love listening to Portuguese music.", phonetic: "Ew ah-DOH-roo oh-VEER MOO-zee-kah por-too-GAY-zah.", col: "opinions" },
+  { pt: "Eu estou a pensar em ti.", en: "I am thinking about you.", phonetic: "Ew shtoh ah pen-SAR em TEE.", col: "opinions" },
+  { pt: "Eu trabalho muito.", en: "I work a lot.", phonetic: "Ew tra-BA-lyoo MWEE-too.", col: "work" },
+  { pt: "Eu gosto de trabalhar.", en: "I like to work.", phonetic: "Ew GOSH-too deh tra-ba-LYAR.", col: "work" },
+  { pt: "Eu dou dinheiro para a minha família.", en: "I give money to my family.", phonetic: "Ew DOH din-YAY-roo PAH-rah ah MEEN-yah fah-MEE-lyah.", col: "family" },
+  { pt: "Eu tenho uma família grande.", en: "I have a big family.", phonetic: "Ew TEN-yo OO-mah fah-MEE-lyah GRAN-deh.", col: "family" },
+  { pt: "Eu falo com a minha família toda a semana.", en: "I speak with my family every week.", phonetic: "Ew FAH-loo kom ah MEEN-yah fah-MEE-lyah TOH-dah ah seh-MAN-ah.", col: "family" },
+  { pt: "Eu tenho amigos em Portugal.", en: "I have friends in Portugal.", phonetic: "Ew TEN-yo ah-MEE-gooz em por-too-GAL.", col: "family" },
+  { pt: "Ele é muito simpático.", en: "He is very friendly.", phonetic: "EH-leh EH MWEE-too seem-PAH-tee-koo.", col: "family" },
+  { pt: "Ela fala muito rápido.", en: "She speaks very fast.", phonetic: "EH-lah FAH-lah MWEE-too RAH-pee-doo.", col: "family" },
+  { pt: "Eu gosto de ouvir música.", en: "I like to listen to music.", phonetic: "Ew GOSH-too deh oh-VEER MOO-zee-kah.", col: "hobbies" },
+  { pt: "Eu quero ver televisão à noite.", en: "I want to watch television at night.", phonetic: "Ew KEH-roo VAIR teh-leh-vee-ZOWNG ah NOY-teh.", col: "hobbies" },
+  { pt: "Eu estou a aprender português.", en: "I am learning Portuguese.", phonetic: "Ew shtoh ah ah-pren-DAIR por-too-GAISH.", col: "learning" },
+  { pt: "Eu quero vir aqui todos os dias.", en: "I want to come here every day.", phonetic: "Ew KEH-roo VEER ah-KEE TOH-dooz ooz DEE-ash.", col: "learning" },
+  { pt: "Eu ainda estou a aprender.", en: "I am still learning.", phonetic: "Ew ah-EEN-dah shtoh ah ah-pren-DAIR.", col: "learning" },
+  { pt: "Eu preciso de estudar sempre.", en: "I always need to study.", phonetic: "Ew preh-SEE-zoo deh shtu-DAR SEM-preh.", col: "learning" },
+  { pt: "Eu sei que preciso de estudar.", en: "I know that I need to study.", phonetic: "Ew SAY keh preh-SEE-zoo deh shtu-DAR.", col: "learning" },
+  { pt: "Eu também quero aprender português.", en: "I also want to learn Portuguese.", phonetic: "Ew tam-BEM KEH-roo ah-pren-DAIR por-too-GAISH.", col: "learning" },
+  { pt: "Eu ainda não terminei.", en: "I haven't finished yet.", phonetic: "Ew ah-EEN-dah NOWNG ter-mee-NAY.", col: "learning" },
+  { pt: "Eu estou a tentar falar mais devagar.", en: "I am trying to speak more slowly.", phonetic: "Ew shtoh ah ten-TAR fah-LAR MYSH deh-vah-GAR.", col: "learning" },
+  { pt: "Eu não percebi o que disseste.", en: "I didn't understand what you said.", phonetic: "Ew NOWNG per-seh-BEE oo keh dee-SESH-teh.", col: "learning" },
+  { pt: "Podes repetir mais devagar?", en: "Can you repeat more slowly?", phonetic: "POH-desh reh-peh-TEER MYSH deh-vah-GAR?", col: "learning" },
+  { pt: "Estou a aprender cada vez mais.", en: "I am learning more and more.", phonetic: "Shtoh ah ah-pren-DAIR KAH-dah VEZ MYSH.", col: "learning" },
+  { pt: "Eu estou a tentar perceber.", en: "I am trying to understand.", phonetic: "Ew shtoh ah ten-TAR per-seh-BAIR.", col: "learning" },
+  { pt: "Um dia vou falar português fluentemente.", en: "One day I will speak Portuguese fluently.", phonetic: "Oom DEE-ah VOH fah-LAR por-too-GAISH floo-en-teh-MEN-teh.", col: "learning" },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let sentences = [];
+let queue = [];
+let currentIdx = 0;
+let isPlaying = false;
+let isShuffle = false;
+let isLoop = false;
+let showEn = true;
+let showPhon = true;
+let speechRate = 0.85;
+let apiKey = '';
+let voiceId = 'XB0fDUnXU5powFXDhCwa';
+let audioCache = {};
+let activeCollection = 'all';
+let currentAudio = null;
+let isLoading = false;
+let pauseTimer = null;
+
+// ─── STORAGE ──────────────────────────────────────────────────────────────────
+function loadData() {
+  // Try to read from trainer's localStorage first
+  try {
+    const trainerData = localStorage.getItem('pt_trainer_v4');
+    if (trainerData) {
+      const d = JSON.parse(trainerData);
+      if (d.sentences && d.sentences.length > 0) {
+        sentences = d.sentences.map(s => ({ pt: s.pt, en: s.en, phonetic: s.phonetic || '', col: s.col || 'general' }));
+        showToast('Loaded ' + sentences.length + ' sentences from Trainer');
+        buildQueue();
+        return;
+      }
+    }
+  } catch(e) {}
+
+  // Fall back to player's own storage
+  try {
+    const saved = localStorage.getItem('pt_player_v1');
+    if (saved) {
+      sentences = JSON.parse(saved);
+    } else {
+      sentences = DEFAULT_SENTENCES.map(s => ({ pt: s.pt, en: s.en, phonetic: s.phonetic || '', col: s.col || 'general' }));
+    }
+  } catch(e) {
+    sentences = DEFAULT_SENTENCES.map(s => ({ pt: s.pt, en: s.en, phonetic: s.phonetic || '', col: s.col || 'general' }));
+  }
+  buildQueue();
+}
+
+function saveData() {
+  try { localStorage.setItem('pt_player_v1', JSON.stringify(sentences)); } catch(e) {}
+}
+
+function loadSettings() {
+  try {
+    const cfg = localStorage.getItem('pt_trainer_cfg');
+    if (cfg) {
+      const c = JSON.parse(cfg);
+      apiKey = c.apiKey || '';
+      voiceId = c.voiceId || 'XB0fDUnXU5powFXDhCwa';
+      if (apiKey) {
+        document.getElementById('api-key-input').value = apiKey;
+        document.getElementById('api-status').className = 'api-status ok';
+        document.getElementById('api-status').textContent = '✓ API key loaded from Trainer';
+      }
+      document.getElementById('voice-select').value = voiceId;
+    }
+  } catch(e) {}
+}
+
+function saveSettings() {
+  apiKey = document.getElementById('api-key-input').value.trim();
+  voiceId = document.getElementById('voice-select').value;
+  audioCache = {};
+  try {
+    localStorage.setItem('pt_trainer_cfg', JSON.stringify({ apiKey, voiceId }));
+    const st = document.getElementById('api-status');
+    st.className = apiKey ? 'api-status ok' : 'api-status err';
+    st.textContent = apiKey ? '✓ Saved — EP audio active' : 'No key — using browser TTS fallback';
+  } catch(e) {}
+  showToast('Settings saved');
+}
+
+// ─── QUEUE ────────────────────────────────────────────────────────────────────
+function buildQueue() {
+  let filtered = sentences;
+  if (activeCollection !== 'all') filtered = sentences.filter(s => s.col === activeCollection);
+  queue = filtered.map((s, i) => ({ ...s, origIdx: sentences.indexOf(s) }));
+  if (isShuffle) queue = shuffleArr([...queue]);
+  if (currentIdx >= queue.length) currentIdx = 0;
+  updateNowPlaying();
+  renderList();
+  renderCollections();
+  updateCacheInfo();
+}
+
+function shuffleArr(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ─── PLAYBACK ─────────────────────────────────────────────────────────────────
+let playbackId = 0; // incremented on every play/pause to cancel stale loops
+
+async function togglePlayPause() {
+  if (isPlaying) { pause(); } else { await play(); }
+}
+
+function pause() {
+  isPlaying = false;
+  playbackId++;
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  if (pauseTimer) { clearTimeout(pauseTimer); pauseTimer = null; }
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  document.getElementById('play-pause-btn').textContent = '▶';
+  document.getElementById('play-pause-btn').classList.remove('loading');
+}
+
+async function play() {
+  if (!queue.length) { showToast('No sentences to play'); return; }
+  isPlaying = true;
+  const myId = ++playbackId;
+  const btn = document.getElementById('play-pause-btn');
+
+  while (isPlaying && myId === playbackId) {
+    if (currentIdx >= queue.length) {
+      if (isLoop) { currentIdx = 0; } else { pause(); break; }
+    }
+
+    updateNowPlaying();
+    highlightCurrent();
+
+    const s = queue[currentIdx];
+    btn.textContent = '⏸';
+    btn.classList.remove('loading');
+
+    // Play PT (ElevenLabs if key set)
+    btn.textContent = '…'; btn.classList.add('loading');
+    await speakText(s.pt, 'pt-PT');
+    if (!isPlaying || myId !== playbackId) break;
+
+    // Gap between PT and EN
+    await sleep(850);
+    if (!isPlaying || myId !== playbackId) break;
+
+    // Play EN (also ElevenLabs if key set, English voice)
+    await speakText(s.en, 'en-GB');
+    if (!isPlaying || myId !== playbackId) break;
+
+    // Gap before next sentence
+    await sleep(1300);
+    if (!isPlaying || myId !== playbackId) break;
+
+    btn.textContent = '⏸'; btn.classList.remove('loading');
+    currentIdx++;
+  }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => { pauseTimer = setTimeout(resolve, ms); });
+}
+
+async function nextTrack() {
+  const wasPlaying = isPlaying;
+  pause();
+  currentIdx = Math.min(queue.length - 1, currentIdx + 1);
+  updateNowPlaying();
+  highlightCurrent();
+  if (wasPlaying) await play();
+}
+
+async function prevTrack() {
+  const wasPlaying = isPlaying;
+  pause();
+  currentIdx = Math.max(0, currentIdx - 1);
+  updateNowPlaying();
+  highlightCurrent();
+  if (wasPlaying) await play();
+}
+
+function seekTo(e) {
+  if (!queue.length) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  const wasPlaying = isPlaying;
+  pause();
+  currentIdx = Math.round(pct * (queue.length - 1));
+  updateNowPlaying();
+  highlightCurrent();
+  if (wasPlaying) play();
+}
+
+// ─── AUDIO ────────────────────────────────────────────────────────────────────
+async function speakText(text, lang) {
+  return new Promise(async resolve => {
+    if (apiKey) {
+      // Use ElevenLabs for both PT and EN
+      await speakElevenLabs(text, lang);
+      resolve();
+    } else {
+      speakBrowser(text, lang, resolve);
+    }
+  });
+}
+
+async function speakElevenLabs(text, lang) {
+  // Use EP voice for PT, a natural English voice for EN
+  const vid = lang === 'pt-PT' ? voiceId : 'EXAVITQu4vr4xnSDxMaL'; // Sarah - natural EN
+  const cacheKey = text + '|' + vid;
+  return new Promise(async resolve => {
+    if (audioCache[cacheKey]) {
+      playBlob(audioCache[cacheKey], resolve);
+      return;
+    }
+    try {
+      const res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + vid + '/stream', {
+        method: 'POST',
+        headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: speechRate }
+        })
+      });
+      if (!res.ok) { speakBrowser(text, lang, resolve); return; }
+      const blob = await res.blob();
+      audioCache[cacheKey] = blob;
+      updateCacheInfo();
+      playBlob(blob, resolve);
+    } catch(e) {
+      speakBrowser(text, lang, resolve);
+    }
+  });
+}
+
+function playBlob(blob, onEnd) {
+  const url = URL.createObjectURL(blob);
+  currentAudio = new Audio(url);
+  currentAudio.playbackRate = Math.min(speechRate * 1.1, 2.0);
+  currentAudio.onended = () => { URL.revokeObjectURL(url); onEnd && onEnd(); };
+  currentAudio.onerror = () => { URL.revokeObjectURL(url); onEnd && onEnd(); };
+  currentAudio.play();
+}
+
+function speakBrowser(text, lang, onEnd) {
+  if (!window.speechSynthesis) { onEnd && onEnd(); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = lang;
+  utt.rate = speechRate;
+  const voices = window.speechSynthesis.getVoices();
+  if (lang === 'pt-PT') {
+    const v = voices.find(v => v.lang === 'pt-PT') || voices.find(v => v.lang && v.lang.startsWith('pt'));
+    if (v) utt.voice = v;
+  }
+  utt.onend = () => onEnd && onEnd();
+  utt.onerror = () => onEnd && onEnd();
+  window.speechSynthesis.speak(utt);
+}
+
+// ─── PRELOAD ──────────────────────────────────────────────────────────────────
+async function preloadAll() {
+  if (!apiKey) { showToast('Add ElevenLabs API key in Settings first'); return; }
+  const btn = document.getElementById('preload-btn');
+  btn.disabled = true;
+  btn.textContent = 'Loading…';
+  let done = 0;
+  for (const s of sentences) {
+    const key = s.pt + '|' + voiceId;
+    if (!audioCache[key]) {
+      try {
+        const res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + voiceId + '/stream', {
+          method: 'POST',
+          headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: s.pt, model_id: 'eleven_multilingual_v2', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: speechRate } })
+        });
+        if (res.ok) audioCache[key] = await res.blob();
+      } catch(e) {}
+    }
+    done++;
+    btn.textContent = done + '/' + sentences.length;
+    updateCacheInfo();
+  }
+  btn.disabled = false;
+  btn.textContent = 'Preload all';
+  showToast('Preloaded ' + Object.keys(audioCache).length + ' sentences');
+}
+
+function updateCacheInfo() {
+  const total = sentences.length;
+  const cached = Object.keys(audioCache).length;
+  const el = document.getElementById('cache-info');
+  if (cached === 0) el.textContent = 'Audio not preloaded';
+  else if (cached >= total) el.textContent = 'All ' + total + ' sentences cached ✓';
+  else el.textContent = cached + ' of ' + total + ' sentences cached';
+}
+
+// ─── UI ───────────────────────────────────────────────────────────────────────
+function updateNowPlaying() {
+  if (!queue.length) {
+    document.getElementById('np-pt').textContent = '—';
+    document.getElementById('np-en').textContent = '';
+    document.getElementById('np-phonetic').textContent = '';
+    document.getElementById('np-col').textContent = '';
+    document.getElementById('playback-count').textContent = '0 / 0';
+    document.getElementById('playback-fill').style.width = '0%';
+    return;
+  }
+  const idx = Math.min(currentIdx, queue.length - 1);
+  const s = queue[idx];
+  document.getElementById('np-pt').textContent = s.pt;
+  document.getElementById('np-en').textContent = showEn ? s.en : '';
+  document.getElementById('np-en').style.opacity = showEn ? '1' : '0';
+  document.getElementById('np-phonetic').textContent = showPhon && s.phonetic ? s.phonetic : '';
+  document.getElementById('np-col').textContent = s.col || '';
+  document.getElementById('playback-count').textContent = (idx + 1) + ' / ' + queue.length;
+  const pct = queue.length > 1 ? (idx / (queue.length - 1)) * 100 : 0;
+  document.getElementById('playback-fill').style.width = pct + '%';
+  document.getElementById('total-count').textContent = sentences.length;
+}
+
+function highlightCurrent() {
+  document.querySelectorAll('.s-card').forEach((c, i) => {
+    c.classList.toggle('playing', i === currentIdx);
+  });
+  // Scroll playing card into view
+  const cards = document.querySelectorAll('.s-card');
+  if (cards[currentIdx]) cards[currentIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderList() {
+  const list = document.getElementById('sentence-list');
+  list.innerHTML = '';
+  document.getElementById('total-count').textContent = sentences.length;
+  if (!queue.length) {
+    list.innerHTML = '<div class="empty-state">No sentences. Tap ＋ to add one.</div>';
+    return;
+  }
+  queue.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 's-card' + (i === currentIdx ? ' playing' : '');
+    card.innerHTML =
+      '<div class="s-num">' + (i + 1) + '</div>' +
+      '<div class="s-text">' +
+        '<div class="s-pt">' + escHtml(s.pt) + '</div>' +
+        '<div class="s-en">' + escHtml(s.en) + '</div>' +
+      '</div>' +
+      '<button class="s-del" onclick="deleteSentence(' + s.origIdx + ', event)" title="Delete">✕</button>';
+    card.addEventListener('click', e => {
+      if (e.target.classList.contains('s-del')) return;
+      const wasPlaying = isPlaying;
+      pause();
+      currentIdx = i;
+      updateNowPlaying();
+      highlightCurrent();
+      if (wasPlaying) play();
+    });
+    list.appendChild(card);
+  });
+}
+
+function renderCollections() {
+  const bar = document.getElementById('coll-bar');
+  bar.innerHTML = '';
+  const cols = ['all', ...new Set(sentences.map(s => s.col).filter(Boolean))];
+  cols.forEach(col => {
+    const tag = document.createElement('div');
+    tag.className = 'opt-tag' + (col === activeCollection ? ' active' : '');
+    tag.textContent = col;
+    tag.onclick = () => {
+      activeCollection = col;
+      currentIdx = 0;
+      pause();
+      buildQueue();
+    };
+    bar.appendChild(tag);
+  });
+}
+
+function toggleShuffle() {
+  isShuffle = !isShuffle;
+  document.getElementById('shuffle-btn').classList.toggle('active-ctrl', isShuffle);
+  buildQueue();
+  showToast(isShuffle ? 'Shuffle on' : 'Shuffle off');
+}
+
+function toggleLoop() {
+  isLoop = !isLoop;
+  document.getElementById('loop-btn').classList.toggle('active-ctrl', isLoop);
+  showToast(isLoop ? 'Loop on' : 'Loop off');
+}
+
+function toggleShowEn() {
+  showEn = !showEn;
+  document.getElementById('show-en-btn').classList.toggle('active-ctrl', showEn);
+  updateNowPlaying();
+}
+
+function toggleShowPhon() {
+  showPhon = !showPhon;
+  document.getElementById('show-phon-btn').classList.toggle('active-ctrl', showPhon);
+  updateNowPlaying();
+}
+
+function updateSpeed(val) {
+  speechRate = parseFloat(val) / 100;
+  document.getElementById('speed-label').textContent = speechRate.toFixed(1) + '×';
+}
+
+function toggleSettings() {
+  const p = document.getElementById('settings-panel');
+  const b = document.getElementById('settings-btn');
+  const open = p.classList.toggle('open');
+  b.classList.toggle('active-btn', open);
+}
+
+function toggleAdd() {
+  const d = document.getElementById('add-drawer');
+  const b = document.getElementById('add-btn');
+  const open = d.classList.toggle('open');
+  b.classList.toggle('active-btn', open);
+  if (open) setTimeout(() => document.getElementById('input-pt').focus(), 320);
+}
+
+function addSentence() {
+  const pt = document.getElementById('input-pt').value.trim();
+  const en = document.getElementById('input-en').value.trim();
+  const phonetic = document.getElementById('input-phonetic').value.trim();
+  const col = document.getElementById('input-coll').value.trim() || 'general';
+  if (!pt || !en) { showToast('Enter both Portuguese and English'); return; }
+  sentences.push({ pt, en, phonetic, col });
+  document.getElementById('input-pt').value = '';
+  document.getElementById('input-en').value = '';
+  document.getElementById('input-phonetic').value = '';
+  document.getElementById('input-coll').value = '';
+  document.getElementById('add-drawer').classList.remove('open');
+  document.getElementById('add-btn').classList.remove('active-btn');
+  saveData();
+  buildQueue();
+  showToast('Sentence added');
+}
+
+function deleteSentence(origIdx, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this sentence?')) return;
+  sentences.splice(origIdx, 1);
+  if (currentIdx >= queue.length - 1) currentIdx = Math.max(0, queue.length - 2);
+  saveData();
+  buildQueue();
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => {};
+  setTimeout(() => window.speechSynthesis.getVoices(), 100);
+}
+
+loadSettings();
+loadData();
+</script>
+</body>
+</html>
