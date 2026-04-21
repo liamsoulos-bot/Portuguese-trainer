@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="PT Trainer" />
+<meta name="theme-color" content="#0f0f0d" />
+<title>PT Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f0f0d;
+  --bg2: #1a1a17;
+  --bg3: #232320;
+  --bg4: #2c2c28;
+  --line: rgba(255,255,255,0.07);
+  --line2: rgba(255,255,255,0.13);
+  --text: #f0ede4;
+  --text2: #8a8780;
+  --text3: #55534e;
+  --gold: #c9a84c;
+  --gold2: #e8c97a;
+  --red: #c0392b;
+  --red-bg: rgba(192,57,43,0.12);
+  --green: #4a7c59;
+  --green-bg: rgba(74,124,89,0.15);
+  --green-text: #7dbd94;
+  --radius: 10px;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+html { background: var(--bg); height: 100%; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+
+/* FIXED TOP PANEL */
+.top-panel {
+  flex-shrink: 0;
+  background: var(--bg);
+  border-bottom: 0.5px solid var(--line);
+  padding: 0.5rem 1rem 0.6rem;
+  width: 100%;
+  padding-top: calc(0.5rem + env(safe-area-inset-top));
+}
+
+/* SCROLLABLE CONTENT */
+.scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem 1rem 5rem;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.header-left { flex: 1; }
+
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.header-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.header-title em {
+  font-style: italic;
+  color: var(--gold2);
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: var(--bg3);
+  border: 0.5px solid var(--line2);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 14px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.icon-btn:hover { background: var(--bg4); color: var(--text); }
+.icon-btn.active-btn { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 7px 6px;
+  text-align: center;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+/* PROGRESS */
+.progress-section {
+  background: var(--bg2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin-bottom: 0.5rem;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+}
+
+.progress-pct { color: var(--gold); font-weight: 500; }
+
+.progress-bar-bg {
+  background: var(--bg4);
+  border-radius: 99px;
+  height: 5px;
+}
+
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  border-radius: 99px;
+  height: 5px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  min-width: 0;
+}
+
+/* COLLECTIONS */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  margin-bottom: 8px;
+  margin-top: 1.25rem;
+}
+
+.collection-bar {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.coll-tag {
+  padding: 5px 11px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 0.5px solid var(--line2);
+  cursor: pointer;
+  background: var(--bg2);
+  color: var(--text2);
+  transition: all 0.15s;
+  user-select: none;
+  font-family: var(--font-mono);
+}
+.coll-tag:hover { background: var(--bg3); color: var(--text); }
+.coll-tag.active { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; }
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 0.4rem;
+  background: var(--bg2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 3px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 7px;
+  border-radius: 7px;
+  border: none;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.mode-btn.active { background: var(--gold); color: var(--bg); }
+.mode-btn.inactive { background: transparent; color: var(--text2); }
+.mode-btn.inactive:hover { color: var(--text); }
+
+/* TIP */
+.tip-box {
+  background: var(--bg2);
+  border-left: 2px solid var(--gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 12px;
+  font-size: 11.5px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.tip-box strong { color: var(--text); font-weight: 600; }
+
+/* SPEED ROW IN FIXED PANEL */
+.speed-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speed-label-txt {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text3);
+  min-width: 22px;
+}
+
+.speed-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--gold);
+  min-width: 28px;
+  text-align: right;
+}
+
+input[type=range] {
+  flex: 1;
+  accent-color: var(--gold);
+  height: 3px;
+}
+
+/* ADD DRAWER */
+.add-drawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.add-drawer.open {
+  max-height: 400px;
+}
+.add-drawer-inner {
+  padding: 0.6rem 0 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.add-drawer-row {
+  display: flex;
+  gap: 6px;
+}
+.add-drawer .input-field {
+  font-size: 12px;
+  padding: 7px 10px;
+}
+.add-drawer .add-btn {
+  padding: 8px;
+  font-size: 12px;
+}
+
+/* SENTENCES */
+.sentences-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 1.25rem;
+}
+
+.sentence-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 13px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  position: relative;
+}
+
+.sentence-card:hover { border-color: var(--line2); }
+.sentence-card.active-card { border-color: var(--gold); background: var(--bg3); }
+.sentence-card.hard-card { border-left: 2px solid var(--red); }
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.sentence-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mastered-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: var(--green-bg);
+  color: var(--green-text);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.hard-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: var(--red-bg);
+  color: #e07060;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.sentence-main {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.sentence-reveal {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--gold);
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+}
+.sentence-reveal:hover { opacity: 0.75; }
+
+.sentence-translation {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 5px;
+  line-height: 1.4;
+  display: none;
+}
+.sentence-translation.visible { display: block; }
+
+.sentence-phonetic {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-style: italic;
+  display: none;
+}
+.sentence-phonetic.visible { display: block; }
+
+.card-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.stars-row { display: flex; gap: 3px; }
+
+.star {
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--bg4);
+  transition: color 0.1s, transform 0.1s;
+  user-select: none;
+}
+.star:hover { transform: scale(1.25); }
+.star.filled { color: var(--gold); }
+
+.card-btns {
+  display: flex;
+  gap: 5px;
+}
+
+.sm-btn {
+  background: none;
+  border: 0.5px solid var(--line2);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 12px;
+  transition: all 0.15s;
+}
+.sm-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--line2); }
+.sm-btn.hard-active { background: var(--red-bg); border-color: var(--red); color: #e07060; }
+.sm-btn.audio-loading { opacity: 0.5; cursor: wait; }
+
+/* ADD SECTION */
+.add-section {
+  background: var(--bg2);
+  border: 0.5px dashed var(--line2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 1rem;
+}
+
+.add-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 7px;
+  border: 0.5px solid var(--line2);
+  font-size: 13px;
+  background: var(--bg3);
+  color: var(--text);
+  font-family: var(--font-body);
+  transition: border-color 0.15s;
+}
+.input-field:focus { outline: none; border-color: var(--gold); background: var(--bg4); }
+.input-field::placeholder { color: var(--text3); }
+
+.add-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 7px;
+  border: none;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  transition: background 0.15s;
+}
+.add-btn:hover { background: var(--gold2); }
+
+/* SETTINGS PANEL */
+.settings-panel {
+  display: none;
+  background: var(--bg2);
+  border: 0.5px solid var(--line2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.settings-panel.open { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.settings-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.settings-row {
+  margin-bottom: 10px;
+}
+
+.settings-row label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.settings-note {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.settings-note a { color: var(--gold); text-decoration: none; }
+
+.save-btn {
+  padding: 8px 16px;
+  border-radius: 7px;
+  border: none;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+.save-btn:hover { background: var(--gold2); }
+
+.api-status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  display: none;
+}
+.api-status.ok { background: var(--green-bg); color: var(--green-text); display: block; }
+.api-status.err { background: var(--red-bg); color: #e07060; display: block; }
+
+/* EMPTY */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text3);
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+
+/* DIFFICULT FILTER */
+.filter-row {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 0.75rem;
+  align-items: center;
+}
+
+.filter-tag {
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 0.5px solid var(--line2);
+  cursor: pointer;
+  background: var(--bg2);
+  color: var(--text2);
+  transition: all 0.15s;
+  user-select: none;
+  font-family: var(--font-mono);
+}
+.filter-tag:hover { background: var(--bg3); }
+.filter-tag.active { background: var(--red-bg); color: #e07060; border-color: var(--red); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg3);
+  border: 0.5px solid var(--line2);
+  border-radius: 99px;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text2);
+  opacity: 0;
+  transition: all 0.25s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* DELETE BTN */
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.delete-btn:hover { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- FIXED TOP PANEL -->
+<div class="top-panel">
+  <div style="max-width:640px;margin:0 auto;">
+
+    <div class="header">
+      <div class="header-left">
+        <div class="header-eyebrow">European Portuguese</div>
+        <div class="header-title">PT <em>Trainer</em></div>
+      </div>
+      <div class="header-right">
+        <button class="icon-btn" id="add-btn" onclick="toggleAddDrawer()" title="Add sentence">＋</button>
+        <button class="icon-btn" id="filter-hard-btn" onclick="toggleHardFilter()" title="Show difficult only">🔥</button>
+        <button class="icon-btn" id="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="settings-panel" id="settings-panel">
+      <div class="settings-title">Settings</div>
+      <div class="settings-row">
+        <label>ElevenLabs API Key</label>
+        <input class="input-field" type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" />
+        <div class="api-status" id="api-status"></div>
+        <p class="settings-note">Paste your ElevenLabs key for native EP audio. Get one free at <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a> — Text to Speech → Read access only.</p>
+      </div>
+      <div class="settings-row">
+        <label>EP Voice</label>
+        <select class="input-field" id="voice-select">
+          <option value="XB0fDUnXU5powFXDhCwa">Charlotte (EP Female)</option>
+          <option value="pqHfZKP75CvOlQylNhV4">Bill (EP Male)</option>
+          <option value="onwK4e9ZLuTAKqWW03F9">Daniel (EP Male)</option>
+        </select>
+      </div>
+      <button class="save-btn" onclick="saveSettings()">Save settings</button>
+    </div>
+
+    <!-- ADD DRAWER -->
+    <div class="add-drawer" id="add-drawer">
+      <div class="add-drawer-inner">
+        <input class="input-field" id="input-pt" placeholder="Portuguese sentence" />
+        <input class="input-field" id="input-en" placeholder="English translation" />
+        <input class="input-field" id="input-phonetic" placeholder="Phonetic hint (optional)" />
+        <div class="add-drawer-row">
+          <input class="input-field" id="input-coll" placeholder="Collection" style="flex:1;" />
+          <button class="add-btn" onclick="addSentence()" style="flex-shrink:0;width:80px;">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-practiced">0</div>
+        <div class="stat-label">Practiced</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-reps">0</div>
+        <div class="stat-label">Reps</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-mastered">0</div>
+        <div class="stat-label">Mastered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-hard">0</div>
+        <div class="stat-label">Difficult</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-section" style="margin-bottom:0.5rem;">
+      <div class="progress-label">
+        <span id="progress-text">0 of 0 mastered</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- MODE + SPEED ROW -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:0.4rem;">
+      <div class="mode-toggle" style="flex:1;margin-bottom:0;">
+        <button class="mode-btn active" id="btn-listen" onclick="setMode('listen')">▶ Listen</button>
+        <button class="mode-btn inactive" id="btn-recall" onclick="setMode('recall')">↺ Recall</button>
+      </div>
+      <div class="speed-row" style="flex:1;">
+        <span class="speed-label-txt">slow</span>
+        <input type="range" id="speed-slider" min="40" max="120" value="82" step="1" oninput="updateSpeed(this.value)" />
+        <span class="speed-val" id="speed-label">0.8×</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SCROLLABLE CONTENT -->
+<div class="scroll-content">
+<div class="app">
+
+  <div class="section-label">Collections</div>
+  <div class="collection-bar" id="coll-bar"></div>
+
+  <div class="tip-box" id="mode-tip">
+    <strong>Listen &amp; repeat:</strong> Portuguese shown. Tap ♪ to hear native EP audio, repeat aloud, shadow the rhythm. Reveal English to check. Rate with stars once fluent.
+  </div>
+
+  <div class="section-label">Sentences</div>
+  <div class="sentences-list" id="sentences-list"></div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
+const DEFAULT_SENTENCES = [
+  // ── DAILY LIFE ──────────────────────────────────────────────────────────────
+  { pt: "Eu estou a trabalhar agora.", en: "I am working right now.", phonetic: "Ew shtoh ah tra-ba-LYAR ah-GO-rah.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu acordo cedo de manhã.", en: "I wake up early in the morning.", phonetic: "Ew ah-KOR-doh SAY-doh deh man-YAH.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu preciso de descansar.", en: "I need to rest.", phonetic: "Ew preh-SEE-zoo deh desh-kan-SAR.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não tenho tempo para fazer isto hoje.", en: "I don't have time to do this today.", phonetic: "Ew NOWNG TEN-yo TEM-poo PAH-rah fah-ZER EESH-too OH-zheh.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu fico em casa à noite.", en: "I stay home at night.", phonetic: "Ew FEE-koo em KAH-zah ah NOY-teh.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não posso descansar agora.", en: "I can't rest now.", phonetic: "Ew NOWNG POH-soo desh-kan-SAR ah-GO-rah.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu quero comer depois do trabalho.", en: "I want to eat after work.", phonetic: "Ew KEH-roo koo-MAIR deh-POISH doo tra-BA-lyoo.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Às vezes eu não posso descansar.", en: "Sometimes I can't rest.", phonetic: "Ash VAY-zesh ew NOWNG POH-soo desh-kan-SAR.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu preciso de fazer isto agora.", en: "I need to do this now.", phonetic: "Ew preh-SEE-zoo deh fah-ZER EESH-too ah-GO-rah.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não posso acordar cedo amanhã.", en: "I can't wake up early tomorrow.", phonetic: "Ew NOWNG POH-soo ah-kor-DAR SAY-doo ah-man-YAH.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou a comer agora.", en: "I am eating now.", phonetic: "Ew shtoh ah koo-MAIR ah-GO-rah.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou a beber água.", en: "I am drinking water.", phonetic: "Ew shtoh ah beh-BAIR AH-gwah.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou a andar a pé.", en: "I am walking.", phonetic: "Ew shtoh ah an-DAR ah PAY.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou muito cansado.", en: "I am very tired.", phonetic: "Ew shtoh MWEE-too kan-SAH-doo.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou um pouco doente.", en: "I am a little sick.", phonetic: "Ew shtoh oom POH-koo doo-EN-teh.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou pronto para sair.", en: "I am ready to leave.", phonetic: "Ew shtoh PRON-too PAH-rah sah-EER.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu tenho fome agora.", en: "I am hungry now.", phonetic: "Ew TEN-yo FOH-meh ah-GO-rah.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu tenho sede.", en: "I am thirsty.", phonetic: "Ew TEN-yo SEH-deh.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu faço isto todos os dias.", en: "I do this every day.", phonetic: "Ew FAH-soo EESH-too TOH-dooz ooz DEE-ash.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu às vezes fico em casa.", en: "I sometimes stay home.", phonetic: "Ew ash VAY-zesh FEE-koo em KAH-zah.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu nunca chego tarde.", en: "I never arrive late.", phonetic: "Ew NOON-kah SHEH-goo TAR-deh.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu já comi.", en: "I already ate.", phonetic: "Ew ZHAH koo-MEE.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu normalmente durmo cedo.", en: "I normally sleep early.", phonetic: "Ew nor-mal-MEN-teh DOOR-moo SAY-doo.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu raramente saio à noite.", en: "I rarely go out at night.", phonetic: "Ew rah-rah-MEN-teh SYE-oo ah NOY-teh.", col: "daily life", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  // ── WANTING & NEEDING ────────────────────────────────────────────────────────
+  { pt: "Eu quero aprender mais.", en: "I want to learn more.", phonetic: "Ew KEH-roo ah-pren-DAIR MYSH.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu quero falar contigo.", en: "I want to talk to you.", phonetic: "Ew KEH-roo fah-LAR kon-TEE-goo.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu quero ir ao mercado.", en: "I want to go to the market.", phonetic: "Ew KEH-roo EER ow mer-KAH-doo.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu preciso de ajuda.", en: "I need help.", phonetic: "Ew preh-SEE-zoo deh ah-ZHOO-dah.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu preciso de dormir mais.", en: "I need to sleep more.", phonetic: "Ew preh-SEE-zoo deh dor-MEER MYSH.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu preciso de comprar comida.", en: "I need to buy food.", phonetic: "Ew preh-SEE-zoo deh kom-PRAR koo-MEE-dah.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu preciso de falar com ele.", en: "I need to speak with him.", phonetic: "Ew preh-SEE-zoo deh fah-LAR kom EH-leh.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não quero sair hoje.", en: "I don't want to go out today.", phonetic: "Ew NOWNG KEH-roo sah-EER OH-zheh.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não preciso de mais nada.", en: "I don't need anything else.", phonetic: "Ew NOWNG preh-SEE-zoo deh MYSH NAH-dah.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu só preciso de um momento.", en: "I just need a moment.", phonetic: "Ew SOH preh-SEE-zoo deh oom moo-MEN-too.", col: "wanting & needing", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  // ── ABILITY & POSSIBILITY ────────────────────────────────────────────────────
+  { pt: "Eu posso fazer isso amanhã.", en: "I can do that tomorrow.", phonetic: "Ew POH-soo fah-ZER EE-soo ah-man-YAH.", col: "ability", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não consigo dormir bem.", en: "I can't sleep well.", phonetic: "Ew NOWNG kon-SEE-goo dor-MEER BEM.", col: "ability", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu consigo perceber um pouco.", en: "I can understand a little.", phonetic: "Ew kon-SEE-goo per-seh-BAIR oom POH-koo.", col: "ability", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não posso ir hoje.", en: "I can't go today.", phonetic: "Ew NOWNG POH-soo EER OH-zheh.", col: "ability", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Será que posso perguntar?", en: "May I ask?", phonetic: "Seh-RAH keh POH-soo per-goon-TAR?", col: "ability", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  // ── OPINIONS & FEELINGS ──────────────────────────────────────────────────────
+  { pt: "Eu acho que é difícil.", en: "I think it's difficult.", phonetic: "Ew AH-shoo keh EH dee-FEE-seel.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu acho que tens razão.", en: "I think you're right.", phonetic: "Ew AH-shoo keh TENZ rah-ZOWNG.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu acho isto muito interessante.", en: "I find this very interesting.", phonetic: "Ew AH-shoo EESH-too MWEE-too een-teh-reh-SAN-teh.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu sinto-me bem hoje.", en: "I feel well today.", phonetic: "Ew SEEN-too-meh BEM OH-zheh.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu sinto-me nervoso antes de falar.", en: "I feel nervous before speaking.", phonetic: "Ew SEEN-too-meh ner-VOH-zoo AN-tesh deh fah-LAR.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu gosto muito de Portugal.", en: "I really like Portugal.", phonetic: "Ew GOSH-too MWEE-too deh por-too-GAL.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não gosto de acordar cedo.", en: "I don't like waking up early.", phonetic: "Ew NOWNG GOSH-too deh ah-kor-DAR SAY-doo.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu adoro ouvir música portuguesa.", en: "I love listening to Portuguese music.", phonetic: "Ew ah-DOH-roo oh-VEER MOO-zee-kah por-too-GAY-zah.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou a pensar em ti.", en: "I am thinking about you.", phonetic: "Ew shtoh ah pen-SAR em TEE.", col: "opinions", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  // ── WORK ────────────────────────────────────────────────────────────────────
+  { pt: "Eu trabalho muito.", en: "I work a lot.", phonetic: "Ew tra-BA-lyoo MWEE-too.", col: "work", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu gosto de trabalhar.", en: "I like to work.", phonetic: "Ew GOSH-too deh tra-ba-LYAR.", col: "work", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  // ── FAMILY ───────────────────────────────────────────────────────────────────
+  { pt: "Eu dou dinheiro para a minha família.", en: "I give money to my family.", phonetic: "Ew DOH din-YAY-roo PAH-rah ah MEEN-yah fah-MEE-lyah.", col: "family", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu tenho uma família grande.", en: "I have a big family.", phonetic: "Ew TEN-yo OO-mah fah-MEE-lyah GRAN-deh.", col: "family", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu falo com a minha família toda a semana.", en: "I speak with my family every week.", phonetic: "Ew FAH-loo kom ah MEEN-yah fah-MEE-lyah TOH-dah ah seh-MAN-ah.", col: "family", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu tenho amigos em Portugal.", en: "I have friends in Portugal.", phonetic: "Ew TEN-yo ah-MEE-gooz em por-too-GAL.", col: "family", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Ele é muito simpático.", en: "He is very friendly.", phonetic: "EH-leh EH MWEE-too seem-PAH-tee-koo.", col: "family", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Ela fala muito rápido.", en: "She speaks very fast.", phonetic: "EH-lah FAH-lah MWEE-too RAH-pee-doo.", col: "family", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  // ── HOBBIES ──────────────────────────────────────────────────────────────────
+  { pt: "Eu gosto de ouvir música.", en: "I like to listen to music.", phonetic: "Ew GOSH-too deh oh-VEER MOO-zee-kah.", col: "hobbies", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu quero ver televisão à noite.", en: "I want to watch television at night.", phonetic: "Ew KEH-roo VAIR teh-leh-vee-ZOWNG ah NOY-teh.", col: "hobbies", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  // ── LEARNING PORTUGUESE ──────────────────────────────────────────────────────
+  { pt: "Eu estou a aprender português.", en: "I am learning Portuguese.", phonetic: "Ew shtoh ah ah-pren-DAIR por-too-GAISH.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu quero vir aqui todos os dias.", en: "I want to come here every day.", phonetic: "Ew KEH-roo VEER ah-KEE TOH-dooz ooz DEE-ash.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu ainda estou a aprender.", en: "I am still learning.", phonetic: "Ew ah-EEN-dah shtoh ah ah-pren-DAIR.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu preciso de estudar sempre.", en: "I always need to study.", phonetic: "Ew preh-SEE-zoo deh shtu-DAR SEM-preh.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu sei que preciso de estudar.", en: "I know that I need to study.", phonetic: "Ew SAY keh preh-SEE-zoo deh shtu-DAR.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu também quero aprender português.", en: "I also want to learn Portuguese.", phonetic: "Ew tam-BEM KEH-roo ah-pren-DAIR por-too-GAISH.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu ainda não terminei.", en: "I haven't finished yet.", phonetic: "Ew ah-EEN-dah NOWNG ter-mee-NAY.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou a tentar falar mais devagar.", en: "I am trying to speak more slowly.", phonetic: "Ew shtoh ah ten-TAR fah-LAR MYSH deh-vah-GAR.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu não percebi o que disseste.", en: "I didn't understand what you said.", phonetic: "Ew NOWNG per-seh-BEE oo keh dee-SESH-teh.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Podes repetir mais devagar?", en: "Can you repeat more slowly?", phonetic: "POH-desh reh-peh-TEER MYSH deh-vah-GAR?", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Estou a aprender cada vez mais.", en: "I am learning more and more.", phonetic: "Shtoh ah ah-pren-DAIR KAH-dah VEZ MYSH.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Eu estou a tentar perceber.", en: "I am trying to understand.", phonetic: "Ew shtoh ah ten-TAR per-seh-BAIR.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+  { pt: "Um dia vou falar português fluentemente.", en: "One day I will speak Portuguese fluently.", phonetic: "Oom DEE-ah VOH fah-LAR por-too-GAISH floo-en-teh-MEN-teh.", col: "learning", starsListen: 0, starsRecall: 0, reps: 0, hard: false },
+];
+
+let sentences = [];
+let mode = 'listen';
+let activeIdx = 0;
+let activeCollection = 'all';
+let practiced = 0;
+let totalReps = 0;
+let showHardOnly = false;
+let speechRate = 0.82;
+let apiKey = '';
+let voiceId = 'XB0fDUnXU5powFXDhCwa';
+let audioCache = {};
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem('pt_trainer_v5');
+    if (saved) {
+      const d = JSON.parse(saved);
+      sentences = d.sentences || JSON.parse(JSON.stringify(DEFAULT_SENTENCES));
+      practiced = d.practiced || 0;
+      totalReps = d.totalReps || 0;
+    } else {
+      sentences = JSON.parse(JSON.stringify(DEFAULT_SENTENCES));
+    }
+  } catch(e) { sentences = JSON.parse(JSON.stringify(DEFAULT_SENTENCES)); }
+
+  try {
+    const cfg = localStorage.getItem('pt_trainer_cfg');
+    if (cfg) {
+      const c = JSON.parse(cfg);
+      apiKey = c.apiKey || '';
+      voiceId = c.voiceId || 'XB0fDUnXU5powFXDhCwa';
+      if (apiKey) {
+        document.getElementById('api-key-input').value = apiKey;
+        document.getElementById('api-status').className = 'api-status ok';
+        document.getElementById('api-status').textContent = '✓ API key loaded';
+      }
+      document.getElementById('voice-select').value = voiceId;
+    }
+  } catch(e) {}
+}
+
+function save() {
+  try { localStorage.setItem('pt_trainer_v5', JSON.stringify({ sentences, practiced, totalReps })); } catch(e) {}
+}
+
+function saveSettings() {
+  apiKey = document.getElementById('api-key-input').value.trim();
+  voiceId = document.getElementById('voice-select').value;
+  audioCache = {}; // clear cache when voice changes
+  try {
+    localStorage.setItem('pt_trainer_cfg', JSON.stringify({ apiKey, voiceId }));
+    const st = document.getElementById('api-status');
+    if (apiKey) {
+      st.className = 'api-status ok';
+      st.textContent = '✓ Saved — ElevenLabs EP audio active';
+    } else {
+      st.className = 'api-status err';
+      st.textContent = 'No key — using browser TTS fallback';
+    }
+  } catch(e) {}
+  showToast('Settings saved');
+}
+
+// ─── UI HELPERS ───────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function toggleAddDrawer() {
+  const drawer = document.getElementById('add-drawer');
+  const btn = document.getElementById('add-btn');
+  const open = drawer.classList.toggle('open');
+  btn.classList.toggle('active-btn', open);
+  if (open) setTimeout(() => document.getElementById('input-pt').focus(), 320);
+}
+
+function toggleSettings() {
+  const p = document.getElementById('settings-panel');
+  const b = document.getElementById('settings-btn');
+  const open = p.classList.toggle('open');
+  b.classList.toggle('active-btn', open);
+}
+
+function toggleHardFilter() {
+  showHardOnly = !showHardOnly;
+  document.getElementById('filter-hard-btn').classList.toggle('active-btn', showHardOnly);
+  activeIdx = 0;
+  renderList();
+}
+
+// ─── DATA HELPERS ─────────────────────────────────────────────────────────────
+
+function getCollections() {
+  const cols = [...new Set(sentences.map(s => s.col).filter(Boolean))];
+  return ['all', ...cols];
+}
+
+function getFiltered() {
+  let arr = sentences.map((s, i) => ({ ...s, origIdx: i }));
+  if (activeCollection !== 'all') arr = arr.filter(s => s.col === activeCollection);
+  if (showHardOnly) arr = arr.filter(s => s.hard);
+  return arr;
+}
+
+function getMastered() { return sentences.filter(s => s.starsListen >= 5 && s.starsRecall >= 5).length; }
+function getHardCount() { return sentences.filter(s => s.hard).length; }
+
+// ─── STATS & PROGRESS ─────────────────────────────────────────────────────────
+
+function updateStats() {
+  const mastered = getMastered();
+  const total = sentences.length;
+  const pct = total ? Math.round((mastered / total) * 100) : 0;
+  document.getElementById('stat-practiced').textContent = practiced;
+  document.getElementById('stat-reps').textContent = totalReps;
+  document.getElementById('stat-mastered').textContent = mastered;
+  document.getElementById('stat-hard').textContent = getHardCount();
+  document.getElementById('progress-text').textContent = mastered + ' of ' + total + ' mastered';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+
+function renderCollections() {
+  const bar = document.getElementById('coll-bar');
+  bar.innerHTML = '';
+  getCollections().forEach(col => {
+    const tag = document.createElement('div');
+    tag.className = 'coll-tag' + (col === activeCollection ? ' active' : '');
+    tag.textContent = col;
+    tag.onclick = () => { activeCollection = col; activeIdx = 0; renderCollections(); renderList(); };
+    bar.appendChild(tag);
+  });
+}
+
+function renderList() {
+  const list = document.getElementById('sentences-list');
+  list.innerHTML = '';
+  const filtered = getFiltered();
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">' +
+      (showHardOnly ? 'No difficult sentences flagged yet.<br>Tap 🔥 on a card to mark it.' : 'No sentences yet. Tap ＋ to add one.') +
+      '</div>';
+    return;
+  }
+
+  if (activeIdx >= filtered.length) activeIdx = 0;
+
+  filtered.forEach((s, fi) => {
+    const card = document.createElement('div');
+    let cardClass = 'sentence-card';
+    if (fi === activeIdx) cardClass += ' active-card';
+    if (s.hard) cardClass += ' hard-card';
+    card.className = cardClass;
+
+    const starKey = mode === 'listen' ? 'starsListen' : 'starsRecall';
+    const currentStars = s[starKey] || 0;
+    const isMastered = s.starsListen >= 5 && s.starsRecall >= 5;
+    const isModeMastered = currentStars >= 5;
+    const mainText = mode === 'listen' ? s.pt : s.en;
+    const transText = mode === 'listen' ? s.en : s.pt;
+
+    let badges = '';
+    if (isMastered) badges += '<span class="mastered-badge">mastered</span>';
+    else if (isModeMastered) badges += '<span class="mastered-badge">' + (mode === 'listen' ? '▶ mastered' : '↺ mastered') + '</span>';
+    if (s.hard) badges += '<span class="hard-badge">difficult</span>';
+
+    card.innerHTML =
+      '<div class="card-top-row">' +
+        '<div class="sentence-num">#' + (fi + 1) + ' ' + badges + '</div>' +
+        '<button class="delete-btn" onclick="deleteSentence(' + s.origIdx + ', event)" title="Delete">✕</button>' +
+      '</div>' +
+      '<div class="sentence-main">' + escHtml(mainText) + '</div>' +
+      '<div class="sentence-reveal" id="reveal-btn-' + fi + '" onclick="toggleReveal(' + fi + ')">tap to reveal</div>' +
+      '<div class="sentence-translation" id="trans-' + fi + '">' + escHtml(transText) + '</div>' +
+      (s.phonetic ? '<div class="sentence-phonetic" id="phon-' + fi + '">' + escHtml(s.phonetic) + '</div>' : '') +
+      '<div class="card-bottom-row">' +
+        '<div class="stars-row" id="stars-' + fi + '"></div>' +
+        '<div class="card-btns">' +
+          '<button class="sm-btn ' + (s.hard ? 'hard-active' : '') + '" id="hard-btn-' + fi + '" onclick="toggleHard(' + s.origIdx + ', ' + fi + ', event)" title="Mark as difficult">🔥</button>' +
+          '<button class="sm-btn" id="audio-btn-' + fi + '" onclick="speakCard(' + fi + ', event)" title="Listen">♪</button>' +
+        '</div>' +
+      '</div>';
+
+    card.addEventListener('click', function(e) {
+      const ignoreTags = ['sentence-reveal','sm-btn','star','delete-btn'];
+      if (ignoreTags.some(c => e.target.classList.contains(c))) return;
+      setActive(fi);
+    });
+
+    list.appendChild(card);
+
+    // Stars
+    const starsRow = document.getElementById('stars-' + fi);
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement('span');
+      star.className = 'star' + (currentStars >= i ? ' filled' : '');
+      star.textContent = '★';
+      const sv = i;
+      star.onclick = () => rateStar(s.origIdx, fi, sv);
+      starsRow.appendChild(star);
+    }
+  });
+
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
+
+function toggleReveal(fi) {
+  const el = document.getElementById('trans-' + fi);
+  const btn = document.getElementById('reveal-btn-' + fi);
+  const phon = document.getElementById('phon-' + fi);
+  if (!el || !btn) return;
+  const visible = el.classList.toggle('visible');
+  if (phon) phon.classList.toggle('visible', visible);
+  btn.textContent = visible ? 'hide' : 'tap to reveal';
+}
+
+function rateStar(origIdx, fi, val) {
+  const wasUnpracticed = sentences[origIdx].reps === 0;
+  const starKey = mode === 'listen' ? 'starsListen' : 'starsRecall';
+  sentences[origIdx][starKey] = val;
+  if (wasUnpracticed && val > 0) { practiced++; sentences[origIdx].reps = 1; }
+  save(); updateStats();
+  const starsRow = document.getElementById('stars-' + fi);
+  if (starsRow) {
+    starsRow.querySelectorAll('.star').forEach((s, i) => {
+      s.className = 'star' + (i < val ? ' filled' : '');
+    });
+  }
+}
+
+function toggleHard(origIdx, fi, e) {
+  e.stopPropagation();
+  sentences[origIdx].hard = !sentences[origIdx].hard;
+  save(); updateStats();
+  const btn = document.getElementById('hard-btn-' + fi);
+  if (btn) btn.classList.toggle('hard-active', sentences[origIdx].hard);
+  const card = btn && btn.closest('.sentence-card');
+  if (card) card.classList.toggle('hard-card', sentences[origIdx].hard);
+  showToast(sentences[origIdx].hard ? 'Marked as difficult' : 'Removed from difficult');
+  // Update badges inline
+  renderList();
+}
+
+function deleteSentence(origIdx, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this sentence?')) return;
+  sentences.splice(origIdx, 1);
+  if (activeIdx >= getFiltered().length) activeIdx = Math.max(0, getFiltered().length - 1);
+  save(); updateStats(); renderCollections(); renderList();
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-listen').className = 'mode-btn ' + (m === 'listen' ? 'active' : 'inactive');
+  document.getElementById('btn-recall').className = 'mode-btn ' + (m === 'recall' ? 'active' : 'inactive');
+  const tip = document.getElementById('mode-tip');
+  if (m === 'listen') {
+    tip.innerHTML = '<strong>Listen &amp; repeat:</strong> Portuguese shown. Tap ♪ to hear native EP audio, repeat aloud, shadow the rhythm. Reveal English to check. Rate with stars once fluent.';
+  } else {
+    tip.innerHTML = '<strong>Active recall:</strong> English shown. Say the Portuguese out loud before revealing. Hard mode — builds retrieval speed. Rate with stars once automatic.';
+  }
+  renderList();
+}
+
+function setActive(fi) {
+  activeIdx = fi;
+  document.querySelectorAll('.sentence-card').forEach((c, i) => {
+    c.classList.toggle('active-card', i === fi);
+  });
+}
+
+function prevSentence() { activeIdx = Math.max(0, activeIdx - 1); renderList(); }
+function nextSentence() { const f = getFiltered(); activeIdx = Math.min(f.length - 1, activeIdx + 1); renderList(); }
+
+function updateSpeed(val) {
+  speechRate = parseFloat(val) / 100;
+  document.getElementById('speed-label').textContent = speechRate.toFixed(1) + '×';
+}
+
+// ─── AUDIO ────────────────────────────────────────────────────────────────────
+
+async function speakCard(fi, e) {
+  e.stopPropagation();
+  const filtered = getFiltered();
+  const s = filtered[fi];
+  const text = mode === 'listen' ? s.pt : s.en;
+  const lang = mode === 'listen' ? 'pt-PT' : 'en-GB';
+  const btn = document.getElementById('audio-btn-' + fi);
+  if (btn) { btn.classList.add('audio-loading'); btn.textContent = '…'; }
+  await speakText(text, lang);
+  if (btn) { btn.classList.remove('audio-loading'); btn.textContent = '♪'; }
+  sentences[s.origIdx].reps++;
+  totalReps++;
+  if (sentences[s.origIdx].reps === 1) practiced++;
+  save(); updateStats();
+}
+
+async function speakText(text, lang) {
+  if (apiKey && lang === 'pt-PT') {
+    await speakElevenLabs(text);
+  } else {
+    speakBrowser(text, lang);
+  }
+}
+
+async function speakElevenLabs(text) {
+  const cacheKey = text + '|' + voiceId;
+  if (audioCache[cacheKey]) {
+    playAudioBlob(audioCache[cacheKey]);
+    return;
+  }
+  try {
+    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + voiceId + '/stream', {
+      method: 'POST',
+      headers: {
+        'xi-api-key': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          speed: speechRate,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      showToast('ElevenLabs error — using browser TTS');
+      speakBrowser(text, 'pt-PT');
+      return;
+    }
+
+    const blob = await response.blob();
+    audioCache[cacheKey] = blob;
+    playAudioBlob(blob);
+  } catch(e) {
+    showToast('Network error — using browser TTS');
+    speakBrowser(text, 'pt-PT');
+  }
+}
+
+function playAudioBlob(blob) {
+  const url = URL.createObjectURL(blob);
+  const audio = new Audio(url);
+  audio.play();
+  audio.onended = () => URL.revokeObjectURL(url);
+}
+
+function speakBrowser(text, lang) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = lang;
+  utt.rate = speechRate;
+  const voices = window.speechSynthesis.getVoices();
+  if (lang === 'pt-PT') {
+    const v = voices.find(v => v.lang === 'pt-PT') || voices.find(v => v.lang && v.lang.startsWith('pt'));
+    if (v) utt.voice = v;
+  }
+  window.speechSynthesis.speak(utt);
+}
+
+// ─── ADD SENTENCE ─────────────────────────────────────────────────────────────
+
+function addSentence() {
+  const pt = document.getElementById('input-pt').value.trim();
+  const en = document.getElementById('input-en').value.trim();
+  const phonetic = document.getElementById('input-phonetic').value.trim();
+  const col = document.getElementById('input-coll').value.trim() || 'general';
+  if (!pt || !en) { showToast('Enter both Portuguese and English'); return; }
+  sentences.push({ pt, en, phonetic, col, starsListen: 0, starsRecall: 0, reps: 0, hard: false });
+  document.getElementById('input-pt').value = '';
+  document.getElementById('input-en').value = '';
+  document.getElementById('input-phonetic').value = '';
+  document.getElementById('input-coll').value = '';
+  // close drawer
+  document.getElementById('add-drawer').classList.remove('open');
+  document.getElementById('add-btn').classList.remove('active-btn');
+  save(); updateStats(); renderCollections();
+  activeCollection = col;
+  renderCollections();
+  activeIdx = getFiltered().length - 1;
+  renderList();
+  showToast('Sentence added');
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = function() {};
+  setTimeout(() => window.speechSynthesis.getVoices(), 100);
+}
+
+loadData();
+updateStats();
+renderCollections();
+renderList();
+</script>
+</body>
+</html>
