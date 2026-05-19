@@ -895,7 +895,12 @@ let practiced = 0;
 let totalReps = 0;
 let showHardOnly = false;
 let speechRate = 0.82;
-let apiKey = '';
+
+// ─── PASTE YOUR ELEVENLABS API KEY BELOW ─────────────────────────────────────
+const HARDCODED_API_KEY = '1fe7df03ce81459f669bcd23ba24f540d77d037a26f32c59a61b89e0c4b66004';
+// ─────────────────────────────────────────────────────────────────────────────
+
+let apiKey = HARDCODED_API_KEY;
 let voiceId = 'XB0fDUnXU5powFXDhCwa';
 let audioCache = {};
 
@@ -914,20 +919,27 @@ function loadData() {
     }
   } catch(e) { sentences = JSON.parse(JSON.stringify(DEFAULT_SENTENCES)); }
 
-  try {
-    const cfg = localStorage.getItem('pt_trainer_cfg');
-    if (cfg) {
-      const c = JSON.parse(cfg);
-      apiKey = c.apiKey || '';
-      voiceId = c.voiceId || 'XB0fDUnXU5powFXDhCwa';
-      if (apiKey) {
-        document.getElementById('api-key-input').value = apiKey;
-        document.getElementById('api-status').className = 'api-status ok';
-        document.getElementById('api-status').textContent = '✓ API key loaded';
+  // Only load from storage if no hardcoded key
+  if (!HARDCODED_API_KEY) {
+    try {
+      const cfg = localStorage.getItem('pt_trainer_cfg');
+      if (cfg) {
+        const c = JSON.parse(cfg);
+        apiKey = c.apiKey || '';
+        voiceId = c.voiceId || 'XB0fDUnXU5powFXDhCwa';
+        if (apiKey) {
+          document.getElementById('api-key-input').value = apiKey;
+          document.getElementById('api-status').className = 'api-status ok';
+          document.getElementById('api-status').textContent = '✓ API key loaded';
+        }
+        document.getElementById('voice-select').value = voiceId;
       }
-      document.getElementById('voice-select').value = voiceId;
-    }
-  } catch(e) {}
+    } catch(e) {}
+  } else {
+    document.getElementById('api-key-input').value = '(hardcoded)';
+    document.getElementById('api-status').className = 'api-status ok';
+    document.getElementById('api-status').textContent = '✓ API key active';
+  }
 }
 
 function save() {
